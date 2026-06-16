@@ -1,0 +1,3 @@
+# ウェーブ2: 比較記事本文の短ラベルリンク化ツール
+tools/affiliate_compare_short_links.py
+tools/apply_affiliate_compare_short_links.py

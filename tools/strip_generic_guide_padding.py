@@ -1,0 +1,214 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""ガイド CSV から 180字確保用の汎用パディングを除去する。"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.editorial_quality import is_published_guide, norm  # noqa: E402
+from tools.guide_prose_patterns import PROSE_COLUMNS  # noqa: E402
+
+# section_body_min_filler / ensure_visible_min が付与する末尾文
+GENERIC_SECTION_PAD_RE = re.compile(
+    r"(?:\s|\n)*"
+    r"「[^」]+」では、[^。]*?"
+    r"公式テキストの該当章を開き、(?:主体・期限・数値をメモしながら演習問題で定着を確認|条文の主体・期限・数値を演習問題とセットで押さえて定着を確認)します。"
+    r"数値・日程は[^。]+(?:の)?最新要項で必ず照合してください。"
+    r"[。]?",
+    re.MULTILINE,
+)
+
+# 切れたタイトル + 同パターン（アフィリエイト等）
+BROKEN_TITLE_PAD_RE = re.compile(
+    r"(?:\s|\n)*"
+    r"「[^」]+」では、[^。]{0,80}について公式テキストの該当章を開き、"
+    r"(?:主体・期限・数値をメモしながら演習問題で定着を確認|条文の主体・期限・数値を演習問題とセットで押さえて定着を確認)します。"
+    r"数値・日程は[^。]+(?:の)?最新要項で必ず照合してください。"
+    r"[。]?",
+    re.MULTILINE,
+)
+
+# 節末尾の「「見出し」で。」だけ
+INCOMPLETE_HEADING_TAIL_RE = re.compile(
+    r"(?:\s|\n)*「[^」]+」(?:で|では)[。、]?\s*$",
+    re.MULTILINE,
+)
+
+ENRICH_SECTION_PAD_RE = re.compile(
+    r"(?:\s|\n)*"
+    r"(?:「[^」]+」は[^。]+の論点として、公式テキスト該当章[^。]*演習→用語解説→1週間後[^。]*。"
+    r"|[^。]*演習→用語解説→1週間後の解き直しで定着を確認[^。]*。"
+    r"|「[^」]+」は[^。]+の論点として、公式テキスト該当章と[^。]+の案内を照合し、"
+    r"演習→用語解説→1週間後の解き直しで定着を確認してください。"
+    r"(?:数値・日程・合格基準は[^。]+確認してください。?)?"
+    r")"
+    r"[。]?",
+    re.MULTILINE,
+)
+
+ENRICH_FAQ_PAD_RE = re.compile(
+    r"(?:\s|\n)*"
+    r"「[^」]+」は[^。]+(?:の要項と公式テキストで最新情報を確認してください|について[^。]+確認してください)"
+    r"[^。]*条文の主体・期限・数値を演習問題とセットで押さえる[^。]*。"
+    r"[。]?",
+    re.MULTILINE,
+)
+
+AUTO_LEAD_PAD_RE = re.compile(
+    r"^マンション管理士試験の試験の[^。]+について、マ管受験者が現場で迷いやすい[^。]+。"
+    r"3分野の全体像[^。]*。$",
+    re.MULTILINE,
+)
+
+FAQ_GENERIC_PAD_RE = re.compile(
+    r"\s*"
+    r"(?:合格までの学習を続けるには、出題範囲を分けて、演習と復習を定期的に回す計画が重要です。"
+    r"公式情報を先に確認し、このサイトの演習と用語解説で弱点を補強する流れを推奨します。|"
+    r"マンション管理士試験の[^。]+について、マ管受験者が現場で迷いやすい論点と試験での出題パターンを整理する記事です。"
+    r"公式テキストと[^。]+を参照しながら、演習・用語解説で弱点を補強する進め方をまとめます。|"
+    r"独学で合格を目指す場合は、教材を増やす前に出題範囲と復習の仕組みを決めておくことが大切です。"
+    r"公式情報を先に確認し、このサイトの演習と用語解説で弱点を補強する流れを推奨します。|"
+    r"用語解説は、過去問で出た語句の意味、根拠、似た用語との違いを確認するための入口です。"
+    r"公式情報を先に確認し、このサイトの演習と用語解説で弱点を補強する流れを推奨します。"
+    r")",
+)
+
+# keyword_fallback_default / duplicate-body パッチが付与する節本文
+REWRITE_FALLBACK_PAD_RE = re.compile(
+    r"(?:\s|\n)*"
+    r"「[^」]+」は[^。]+の論点の一つです。"
+    r"[^。]*演習問題の解説と対応づけやすくなります。"
+    r"[。]?",
+    re.MULTILINE,
+)
+
+REWRITE_FALLBACK_ANY_RE = re.compile(
+    r"[^。！？\n]*の論点の一つです[^。！？\n]*[。]",
+)
+
+ORPHAN_REWRITE_RE = re.compile(
+    r"[^。！？\n]*演習問題の解説と対応づけやすくなります[^。！？\n]*[。]",
+)
+
+BROKEN_RENKEI_RE = re.compile(r"連携】+")
+
+REWRITE_FAQ_BOILER_RE = re.compile(
+    r"[^。！？\n]*(?:主体を取り違えていないか|一人で診断|過度な情報開示)[^。！？\n]*[。]",
+)
+
+BROKEN_TOPIC_DE_RE = re.compile(r"では、を")
+BROKEN_TOPIC_FIX = "では、"
+
+# 量産 batch 後も残る boiler / 全サイト共通の演習テンプレ
+PRACTICE_TOPIC_PAD_RE = re.compile(
+    r"(?:\s|\n)*"
+    r"数値・日程・合格基準は年度で更新されるため、学習前と申込前には[^。]+の最新案内を確認してください。"
+    r"演習で[^。]+に関する設問を解いたら。正解理由と誤答肢の違いを短くメモし、"
+    r"用語解説・比較表・よくある誤答タブで似た論点を比較表で整理すると定着しやすくなります。"
+    r"[。]?",
+    re.MULTILINE,
+)
+PRACTICE10_TAIL_RE = re.compile(
+    r"(?:\s|\n)*"
+    r"演習10問を解き、解説で参照条文を公式テキストで開いて読み返してください。"
+    r"数値・日程・合格基準は年度で更新されるため、学習前と申込前には[^。]+の最新案内を確認してください。"
+    r"[。]?",
+    re.MULTILINE,
+)
+FAQ_VERIFY_BOILER_RE = re.compile(
+    r"「[^」]+」は[^。]+の公式テキスト該当章と[^。]+で確認するのが確実です。"
+    r"[^。]+では、条文の要件（誰が・いつ・何を）を演習問題とセットで押さえてください。"
+)
+READ_THROUGH_FAQ_RE = re.compile(
+    r"読了後は、[^。]+の関連する演習を5問以上解き、"
+    r"間違えた選択肢を用語解説で確認してから関連ガイドへ進んでください。"
+    r"1週間後の解き直し日をカレンダーに入れると定着しやすくなります。"
+    r"(?:数値・主体・手順は[^。]+と照合してください。?)?"
+)
+
+
+def strip_padding_from_text(text: str) -> str:
+    if not text:
+        return text
+    out = text
+    prev = None
+    while prev != out:
+        prev = out
+        out = GENERIC_SECTION_PAD_RE.sub("", out)
+        out = BROKEN_TITLE_PAD_RE.sub("", out)
+        out = ENRICH_SECTION_PAD_RE.sub("", out)
+        out = ENRICH_FAQ_PAD_RE.sub("", out)
+        out = AUTO_LEAD_PAD_RE.sub("", out)
+        out = FAQ_GENERIC_PAD_RE.sub("", out)
+        out = REWRITE_FALLBACK_PAD_RE.sub("", out)
+        out = REWRITE_FALLBACK_ANY_RE.sub("", out)
+        out = ORPHAN_REWRITE_RE.sub("", out)
+        out = REWRITE_FAQ_BOILER_RE.sub("", out)
+        out = BROKEN_RENKEI_RE.sub("連携", out)
+        out = INCOMPLETE_HEADING_TAIL_RE.sub("", out)
+        out = PRACTICE_TOPIC_PAD_RE.sub("", out)
+        out = PRACTICE10_TAIL_RE.sub("", out)
+        out = FAQ_VERIFY_BOILER_RE.sub("", out)
+        out = READ_THROUGH_FAQ_RE.sub("", out)
+    out = BROKEN_TOPIC_DE_RE.sub(BROKEN_TOPIC_FIX, out)
+    out = re.sub(r"\n{3,}", "\n\n", out)
+    out = re.sub(r"[ \t]{2,}", " ", out)
+    return out.strip()
+
+
+def strip_row(row: dict[str, str]) -> bool:
+    before = {k: row.get(k, "") for k in row}
+    for col in PROSE_COLUMNS:
+        raw = norm(row.get(col))
+        if not raw:
+            continue
+        cleaned = strip_padding_from_text(raw)
+        if cleaned != raw:
+            row[col] = cleaned
+    return any(before.get(k) != row.get(k, "") for k in row)
+
+
+def strip_site(root: Path, *, dry_run: bool = False, all_rows: bool = False) -> dict:
+    guide_csv = root / "data" / "guide_articles.csv"
+    if not guide_csv.is_file():
+        return {"changed": 0, "error": "missing guide_articles.csv"}
+    with guide_csv.open(encoding="utf-8-sig", newline="") as f:
+        reader = csv.DictReader(f)
+        fieldnames = list(reader.fieldnames or [])
+        rows = list(reader)
+    changed = 0
+    for row in rows:
+        if not all_rows and not is_published_guide(row):
+            continue
+        if strip_row(row):
+            changed += 1
+    if changed and not dry_run:
+        with guide_csv.open("w", encoding="utf-8-sig", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, lineterminator="\n")
+            writer.writeheader()
+            writer.writerows(rows)
+    return {"changed": changed, "rows": len(rows)}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="ガイド CSV 汎用パディング除去")
+    parser.add_argument("--root", type=Path, default=Path.cwd())
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--all-rows", action="store_true", help="draft 含む全行")
+    args = parser.parse_args()
+    stats = strip_site(args.root.resolve(), dry_run=args.dry_run, all_rows=args.all_rows)
+    print(f"strip generic padding: {stats}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

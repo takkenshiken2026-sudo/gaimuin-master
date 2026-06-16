@@ -1,0 +1,271 @@
+{
+  "brandName": "証外マスター",
+  "brandLogoText": "証外マスター",
+  "brandMark": "証外",
+  "examName": "証券外務員（一種・二種）",
+  "siteOrigin": "https://YOUR-DOMAIN.example",
+  "contactUrl": "https://example.com/contact",
+  "ga4MeasurementId": "",
+  "copyright": "",
+  "footerDisclaimer": "学習用のコンテンツです。出題・法令の正確な内容は日本証券業協会などの公式情報で必ず確認してください。",
+  "officialOrganization": "日本証券業協会",
+  "seoCopy": {
+    "mockExam": "模試・模擬試験",
+    "studyModes": "過去問・実践演習・一問一答"
+  },
+  "theme": {
+    "accent": "#1a3d7c",
+    "accentText": "#ffffff",
+    "background": "#f0f0f1",
+    "surface": "#ffffff",
+    "surfaceAlt": "#f4f4f5",
+    "text": "#111111",
+    "textMuted": "#555555",
+    "border": "rgba(0, 0, 0, 0.09)",
+    "radius": "10px",
+    "navWidth": "1080px",
+    "contentWidth": "1080px"
+  },
+  "navigation": {
+    "header": [
+      {
+        "label": "トップ",
+        "href": "index.html",
+        "key": "top"
+      },
+      {
+        "label": "このサイトについて",
+        "href": "about.html",
+        "key": "about"
+      },
+      {
+        "label": "過去問一覧",
+        "href": "q/index.html",
+        "key": "q"
+      },
+      {
+        "label": "用語解説",
+        "href": "terms/index.html",
+        "key": "terms"
+      },
+      {
+        "label": "試験ガイド",
+        "href": "articles/index.html",
+        "key": "articles"
+      },
+      {
+        "label": "関連リンク",
+        "href": "related-sites.html",
+        "key": "related"
+      },
+      {
+        "label": "プライバシー",
+        "href": "privacy.html",
+        "key": "privacy"
+      }
+    ],
+    "footer": [
+      {
+        "label": "トップ",
+        "href": "index.html",
+        "key": "top"
+      },
+      {
+        "label": "このサイトについて",
+        "href": "about.html",
+        "key": "about"
+      },
+      {
+        "label": "過去問一覧",
+        "href": "q/index.html",
+        "key": "q"
+      },
+      {
+        "label": "用語解説",
+        "href": "terms/index.html",
+        "key": "terms"
+      },
+      {
+        "label": "試験ガイド",
+        "href": "articles/index.html",
+        "key": "articles"
+      },
+      {
+        "label": "関連リンク",
+        "href": "related-sites.html",
+        "key": "related"
+      },
+      {
+        "label": "プライバシー",
+        "href": "privacy.html",
+        "key": "privacy"
+      },
+      {
+        "label": "お問い合わせ",
+        "href": "__CONTACT__",
+        "key": "contact"
+      }
+    ]
+  },
+  "guideArticleGenres": [
+    {
+      "id": "overview",
+      "label": "試験概要",
+      "phase": "制度を知る",
+      "style": "overview",
+      "hint": "試験の全体像・公式情報の見方・サイトの使い方"
+    },
+    {
+      "id": "application",
+      "label": "受験・申込",
+      "phase": "制度を知る",
+      "style": "institution",
+      "hint": "受験資格・日程・手数料・申込手続き・免除"
+    },
+    {
+      "id": "pass-stats",
+      "label": "合格・難易度",
+      "phase": "制度を知る",
+      "style": "institution",
+      "hint": "合格率・合格点・難易度・統計の読み方"
+    },
+    {
+      "id": "exam-scope",
+      "label": "出題・形式",
+      "phase": "制度を知る",
+      "style": "institution",
+      "hint": "出題範囲・科目構成・試験形式・CBT"
+    },
+    {
+      "id": "study-plan",
+      "label": "学習計画",
+      "phase": "学習を設計する",
+      "style": "study",
+      "hint": "学習期間・週間表・働きながら・初学者向け"
+    },
+    {
+      "id": "self-study",
+      "label": "独学対策",
+      "phase": "学習を設計する",
+      "style": "study",
+      "hint": "独学の進め方・教材選び・つまずき・継続"
+    },
+    {
+      "id": "past-questions",
+      "label": "過去問活用",
+      "phase": "演習と定着",
+      "style": "practice",
+      "hint": "過去問・模試・一問一答・解き直し・弱点分析"
+    },
+    {
+      "id": "field-study",
+      "label": "分野別対策",
+      "phase": "演習と定着",
+      "style": "practice",
+      "hint": "分野ごとの基礎・頻出・計算・事例"
+    },
+    {
+      "id": "glossary-study",
+      "label": "用語ハブ活用法",
+      "phase": "演習と定着",
+      "style": "practice",
+      "hint": "用語解説一覧の使い方・検索・分野別の回遊"
+    },
+    {
+      "id": "review-weak",
+      "label": "復習・苦手克服",
+      "phase": "演習と定着",
+      "style": "practice",
+      "hint": "復習サイクル・間違いノート・苦手分野の立て直し"
+    },
+    {
+      "id": "final-prep",
+      "label": "直前・当日",
+      "phase": "直前と当日",
+      "style": "final",
+      "hint": "直前1〜2週間・当日の持ち物・会場・メンタル"
+    },
+    {
+      "id": "cautions",
+      "label": "注意点・更新",
+      "phase": "横断",
+      "style": "meta",
+      "hint": "誤解・制度変更・登録手続き・再受験"
+    }
+  ],
+  "fields": [
+    {
+      "id": "products",
+      "name": "金融商品・サービス",
+      "aliases": [
+        "金融商品・サービス",
+        "金融商品",
+        "有価証券",
+        "デリバティブ",
+        "投資信託",
+        "暗号資産"
+      ],
+      "legacyGlossaryCat": "products"
+    },
+    {
+      "id": "solicitation",
+      "name": "勧誘・販売規則",
+      "aliases": [
+        "勧誘・販売規則",
+        "勧誘",
+        "販売等の勧誘",
+        "適合性の原則",
+        "重要事項説明",
+        "契約・実務",
+        "実務"
+      ],
+      "legacyGlossaryCat": "solicitation"
+    },
+    {
+      "id": "fil",
+      "name": "金融商品取引法",
+      "aliases": [
+        "金融商品取引法",
+        "金商法",
+        "インサイダー取引",
+        "相場操縦",
+        "開示",
+        "法令・制度",
+        "関連法令"
+      ],
+      "legacyGlossaryCat": "fil"
+    },
+    {
+      "id": "compliance",
+      "name": "その他法令・業務",
+      "aliases": [
+        "その他法令・業務",
+        "その他の法令",
+        "顧客資産",
+        "コンプライアンス",
+        "倫理",
+        "業務・運営",
+        "設備・その他",
+        "その他"
+      ],
+      "legacyGlossaryCat": "compliance"
+    }
+  ],
+  "externalLinks": [
+    {
+      "label": "日本証券業協会（公式）",
+      "url": "https://www.jsda.or.jp/",
+      "description": "証券外務員資格試験の試験日程・要項・合格発表などの公式情報を確認してください。"
+    },
+    {
+      "label": "証券外務員資格試験",
+      "url": "https://www.jsda.or.jp/activities/exams/gaiin/",
+      "description": "一種・二種外務員の受験案内・申込・試験範囲・CBT 会場情報。"
+    },
+    {
+      "label": "外務員・内部管理責任者等登録",
+      "url": "https://www.jsda.or.jp/activities/exams/gaiin/touroku/",
+      "description": "合格後の登録手続き・有効期限・更新について。"
+    }
+  ]
+}
