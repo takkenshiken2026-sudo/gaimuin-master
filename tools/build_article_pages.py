@@ -717,6 +717,7 @@ def build_article_html(
     *,
     term_hrefs: dict[str, str] | None = None,
     glossary_categories: list[str] | None = None,
+    noindex: bool = False,
 ) -> str:
     slug = article["slug"]
     rel_path = Path("articles") / slug / "index.html"
@@ -958,6 +959,9 @@ def build_article_html(
                 ],
             }
         )
+    robots_meta = (
+        '<meta name="robots" content="noindex, follow">' if noindex else ROBOTS_INDEX_FOLLOW
+    )
     return f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -966,7 +970,7 @@ def build_article_html(
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{html.escape(title)}｜{html.escape(brand_name())}</title>
 <meta name="description" content="{html.escape(desc)}">
-{ROBOTS_INDEX_FOLLOW}
+{robots_meta}
 <link rel="canonical" href="{html.escape(canonical)}">
 <meta property="og:type" content="article">
 <meta property="og:title" content="{html.escape(title)}">
@@ -1186,12 +1190,15 @@ def clean_generated_dirs() -> None:
 
 def main() -> int:
     articles = load_articles()
+    # draft（未公開）記事も生成する（内部リンク切れ防止）。ただし robots=noindex で索引除外し、
+    # 一覧・sitemap からも除く。content_status=published のみ index 対象。
     buildable = [
         article
         for article in articles
-        if is_published_guide(article) and affiliate_article_is_buildable(article, site_root=ROOT)
+        if affiliate_article_is_buildable(article, site_root=ROOT)
     ]
     skipped_affiliate = len(articles) - len(buildable)
+    published = [a for a in buildable if is_published_guide(a)]
     by_slug = {norm(a.get("slug")): a for a in buildable if norm(a.get("slug"))}
     term_hrefs: dict[str, str] | None = None
     glossary_categories: list[str] = []
@@ -1222,11 +1229,14 @@ def main() -> int:
                 by_slug,
                 term_hrefs=term_hrefs,
                 glossary_categories=glossary_categories,
+                noindex=not is_published_guide(article),
             ),
             encoding="utf-8",
         )
-    (ARTICLES_DIR / "index.html").write_text(build_index_html(buildable), encoding="utf-8")
+    (ARTICLES_DIR / "index.html").write_text(build_index_html(published), encoding="utf-8")
+    draft_count = len(buildable) - len(published)
     msg = f"Wrote {len(buildable)} guide articles under {ARTICLES_DIR}"
+    msg += f" ({len(published)} index / {draft_count} noindex draft)"
     if skipped_affiliate:
         msg += f" (skipped {skipped_affiliate} affiliate without ASP links)"
     print(msg)
