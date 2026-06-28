@@ -64,8 +64,8 @@ from tools.seo_editorial_chrome import (  # noqa: E402
     seo_editorial_stylesheet_links,
 )
 
-PRESERVED_TERM_SUBDIRS = frozenset({"compare", "numbers", "mistakes", "priority", "samples", "diagram-samples"})
-PRESERVED_TERM_HTML = frozenset({"index.html", "g-writing-sample.html", "g-diagram-sample.html"})
+PRESERVED_TERM_SUBDIRS = frozenset({"priority"})
+PRESERVED_TERM_HTML = frozenset({"index.html"})
 
 GLOSSARY_CSV = ROOT / "data" / "glossary_terms.csv"
 TERMS_DIR = ROOT / "terms"
@@ -1496,10 +1496,6 @@ def main() -> int:
         hub_count += 1
 
     (TERMS_DIR / "index.html").write_text(build_terms_index(entries, base), encoding="utf-8")
-
-    from tools.build_term_diagram_sample_pages import build_all as build_term_diagram_samples
-
-    build_term_diagram_samples(base_url=base)
 
     write_glossary_article_slug_map(entries)
     sync_index_glossary_slug_map(entries)
