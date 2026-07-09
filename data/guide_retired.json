@@ -1,0 +1,15 @@
+{
+  "updated": "2026-07-09",
+  "redirects": {
+    "field-rights-basics": "study-plan",
+    "field-rights-frequent-topics": "study-plan",
+    "field-rights-calculation": "study-plan",
+    "field-rights-case-study": "study-plan",
+    "field-rights-past-question-focus": "study-plan",
+    "field-limit-basics": "study-plan",
+    "field-limit-frequent-topics": "study-plan",
+    "field-limit-calculation": "study-plan",
+    "field-limit-case-study": "study-plan",
+    "field-limit-past-question-focus": "study-plan"
+  }
+}
