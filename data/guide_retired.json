@@ -10,6 +10,10 @@
     "field-limit-frequent-topics": "study-plan",
     "field-limit-calculation": "study-plan",
     "field-limit-case-study": "study-plan",
-    "field-limit-past-question-focus": "study-plan"
+    "field-limit-past-question-focus": "study-plan",
+    "exemption-system": "exam-eligibility",
+    "education-requirement": "exam-eligibility",
+    "work-experience-requirement": "exam-eligibility",
+    "concurrent-exam-rules": "exam-eligibility"
   }
 }
