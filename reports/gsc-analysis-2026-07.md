@@ -59,10 +59,19 @@
 
 ## 今回の変更
 
+### 第1弾: CTR 改善（発見1への対応）
 - `data/guide_articles.csv`: 4件の `meta_description` を CTR 改善目的で書き換え。
-- 再ビルド（`build_article_pages.py` → `build_guide_retire_redirects.py`）で
-  `articles/{pass-score,exam-format-overview,exam-venue-and-region,exam-application-flow}/index.html`
+- `articles/{pass-score,exam-format-overview,exam-venue-and-region,exam-application-flow}/index.html`
   と記事一覧 `articles/index.html` に反映。meta / og:description / JSON-LD すべて同期を確認。
+
+### 第2弾: 内部リンク集約（発見2・3への対応）
+- **難易度クラスタ**: 柱ページを `exam-difficulty` に定め、`difficulty-for-beginners` /
+  `difficulty-myths` から柱へ「難易度」リンクを追加。柱からも初学者ページへ相互リンク。
+- **過去問クラスタ**: 柱ページを `past-question-strategy` に定め、柱へ未リンクだった9ページ
+  （`past-questions-by-year` ほか）から「過去問の使い方」リンクを追加。
+- **試験日**: どこからもリンクされていなかった `exam-schedule` へ、`exam-application-flow` /
+  `exam-venue-and-region` / `exam-overview` から「試験日程」リンクを追加。
+- `python3 tools/build_all.py` の全検証（sitemap / 内部リンク / 統合 / 公開コンテンツ）をパス。
 
 ## 次アクション候補（優先順）
 
