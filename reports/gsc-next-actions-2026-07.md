@@ -9,7 +9,21 @@
 
 ---
 
-## 🔴 最優先: 練習問題ページ74件が本番から欠落している疑い
+## ✅ 対応済み: 練習問題ページ73件を演習ハブへ301（noindex）リダイレクト
+
+元データ（`takken-data-original.js`）はリポジトリにも全git履歴にも存在せず個別復元は不可のため、
+評価と流入を保全する **noindex リダイレクトで受け皿化**を実装した（2026-07-17）。
+
+- `data/practice_retired.json`: GSCで表示のあった練習問題73URL（ID）を管理。
+- `tools/build_practice_retire_redirects.py`: 各 `q/practice/pXXX/` に演習ハブ `q/practice/index.html`
+  への meta refresh + canonical + `noindex, follow` リダイレクトを生成。実体ページ（p002等）は上書きしない。
+- `build_all.py` に `build_practice_ichimon_pages.py` 直後の再生成ステップとして統合（rmtree で消えない）。
+- noindex のためサイトマップからは自動除外。全検証パス（内部リンク229ファイル・壊れなし）。
+- 効果: 404解消 → 検索評価と流入を生きた演習ハブへ集約。元データが将来入手できれば個別復元に切替も可能。
+
+---
+
+## （記録）当初の調査: 練習問題ページ73件が本番から欠落していた
 
 ### 事実
 - GSCの「ページ」に **`/q/practice/pXXXX/` が74件** 出現。うち **61件が掲載順位10位以内**
