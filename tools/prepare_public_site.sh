@@ -23,6 +23,7 @@ for f in \
   site-analytics.js \
   CNAME \
   robots.txt \
+  ads.txt \
   sitemap.xml \
   .nojekyll \
   favicon.ico \

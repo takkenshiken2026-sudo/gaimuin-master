@@ -21,8 +21,10 @@ from tools.site_config import (
 BRAND_DIR = "assets/brand"
 MARKER = "<!--BRAND_ASSET_HEAD-->"
 # Google AdSense（全ページの <head> に読み込む）。
+# meta タグは所有権確認用（Google 推奨のサイト確認方法）、script は広告配信用。
 ADSENSE_CLIENT = "ca-pub-7927260139193410"
 ADSENSE_HEAD = (
+    f'<meta name="google-adsense-account" content="{ADSENSE_CLIENT}">\n'
     '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'
     f'?client={ADSENSE_CLIENT}" crossorigin="anonymous"></script>'
 )
